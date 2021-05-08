@@ -4,8 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha eslint/tests/*.js",
+    "lint": "eslint . --rulesdir eslint/rules"
   },
   "author": "Tetsuji Higashi <ttexan.developper@gmail.com> (https://github.com/ttexan1)",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "eslint-plugin-jsdoc": "^33.1.0",
+    "eslint-plugin-rulesdir": "^0.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0",
+    "eslint-config-eslint": "^7.0.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "mocha": "^8.4.0"
+  }
 }
