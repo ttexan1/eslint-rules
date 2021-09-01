@@ -4,5 +4,15 @@
   "editor.formatOnSave": true,
   "eslint.format.enable": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": false,
+
+  "eslint.validate": ["typescript", "typescriptreact"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnPaste": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.packageManager": "yarn",
+  "eslint.codeActionsOnSave.mode": "all",
+  "typescript.tsdk": "node_modules/typescript/lib",
 }
