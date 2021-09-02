@@ -41,6 +41,7 @@ module.exports = {
     'rulesdir/no-literal-call': 2,
     'rulesdir/no-double-byte-char': ['warn', 'always'],
     'rulesdir/import-sort': 2,
+    '@typescript-eslint/no-var-requires': 'off',
 
     // 'sort-imports': 0,
     // 'import/order': [2, {

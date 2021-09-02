@@ -59,7 +59,6 @@ function maybeReportSorting (context, sorted, start, end) {
 
 function printSortedItems (sortedItems, originalItems, sourceCode) {
   const newline = guessNewline(sourceCode);
-
   const sorted = sortedItems
     .map((groups) =>
       groups
@@ -106,6 +105,15 @@ function getImportExportItems (
 ) {
   const chunk = handleLastSemicolon(passedChunk, sourceCode);
   return chunk.map((node, nodeIndex) => {
+    // 行ごとにimportされている最初の要素を取得する
+    // namespaceと、default importと、named importを区別
+    const firstSpecifier = node.specifiers[0]
+      ? node.specifiers[0].type === 'ImportNamespaceSpecifier'
+        ? '*'
+        : node.specifiers[0].type === 'ImportDefaultSpecifier'
+          ? node.specifiers[0].local.name
+          : `{${node.specifiers[0].local.name}}`
+      : '';
     const lastLine =
       nodeIndex === 0
         ? node.loc.start.line - 1
@@ -168,6 +176,7 @@ function getImportExportItems (
     return {
       node,
       code,
+      firstSpecifier,
       start: start - indentation.length,
       end: end + trailingSpaces.length,
       isSideEffectImport: isSideEffectImport(node, sourceCode),
@@ -707,22 +716,25 @@ function sortImportExportItems (items) {
     // If both items are side effect imports, keep their original order.
     itemA.isSideEffectImport && itemB.isSideEffectImport
       ? itemA.index - itemB.index
-      : // If one of the items is a side effect import, move it first.
-      itemA.isSideEffectImport
+      : itemA.isSideEffectImport // If one of the items is a side effect import, move it first.
         ? -1
         : itemB.isSideEffectImport
           ? 1
-          : // Compare the `from` part.
-          compare(itemA.source.source, itemB.source.source) ||
-        // The `.source` has been slightly tweaked. To stay fully deterministic,
-        // also sort on the original value.
-        compare(itemA.source.originalSource, itemB.source.originalSource) ||
-        // Then put type imports/exports before regular ones.
-        compare(itemA.source.kind, itemB.source.kind) ||
-        // Keep the original order if the sources are the same. It’s not worth
-        // trying to compare anything else, and you can use `import/no-duplicates`
-        // to get rid of the problem anyway.
-        itemA.index - itemB.index,
+          : itemA.firstSpecifier < itemB.firstSpecifier ? -1 : 1,
+
+    // デフォルトロジックは以下(ソースで並び替えしている)
+    // Compare the `from` part.
+    // The `.source` has been slightly tweaked. To stay fully deterministic,
+    // also sort on the original value.
+    // Then put type imports/exports before regular ones.
+    // Keep the original order if the sources are the same. It’s not worth
+    // trying to compare anything else, and you can use `import/no-duplicates`
+    // to get rid of the problem anyway.
+
+    // : compare(itemA.source.source, itemB.source.source) ||
+    // compare(itemA.source.originalSource, itemB.source.originalSource) ||
+    // compare(itemA.source.kind, itemB.source.kind) ||
+    // itemA.index - itemB.index;
   );
 }
 
@@ -858,13 +870,13 @@ const defaultGroups = [
   ['^\\u0000'],
   // Packages.
   // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
-  ['^@?\\w'],
+  ['^(?=@?\\w)(?!(components|src))'], // もともとのルール ['^@?\\w']
   // Absolute imports and other imports such as Vue-style `@/foo`.
   // Anything not matched in another group.
   ['^'],
   // Relative imports.
   // Anything that starts with a dot.
-  ['^\\.'],
+  ['^(components|src|\\.)'], // もともとのルール ['^\\.'],
 ];
 
 function maybeReportChunkSorting (chunk, context, outerGroups) {
@@ -970,7 +982,7 @@ module.exports = {
         additionalProperties: false,
       },
     ],
-    docs: { url: 'https://aaaa' },
+    docs: { url: '"https://github.com/lydell/eslint-plugin-simple-import-sort#sort-order"' },
     messages: {
       sort: 'Run autofix to sort these imports!',
     },

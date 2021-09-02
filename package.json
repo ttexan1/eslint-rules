@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha eslint/tests/*.js",
     "btest": "mocha --require @babel/register eslint/tests/*.js",
-    "newtest": "mocha eslint/tests/import-sort.js",
+    "sorttest": "mocha eslint/tests/import-sort.js",
     "lint": "eslint . --rulesdir eslint/rules"
   },
   "author": "Tetsuji Higashi <ttexan.developper@gmail.com> (https://github.com/ttexan1)",
