@@ -40,7 +40,21 @@ module.exports = {
     // 0は無効、1は警告、2はエラー
     'rulesdir/no-literal-call': 2,
     'rulesdir/no-double-byte-char': ['warn', 'always'],
-    'rulesdir/import-sort': 2,
+    'rulesdir/import-sort': [2, {
+      groups: [
+        // Side effect imports.
+        ['^\\u0000'],
+        // Packages.
+        // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
+        ['^(?=@?\\w)(?!(components|src))'],
+        // Absolute imports and other imports such as Vue-style `@/foo`.
+        // Anything not matched in another group.
+        ['^'],
+        // Relative imports.
+        // Anything that starts with a dot.
+        ['^(components|src|\\.)'],
+      ],
+    }],
     '@typescript-eslint/no-var-requires': 'off',
 
     // 'sort-imports': 0,

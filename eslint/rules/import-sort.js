@@ -109,7 +109,7 @@ function getImportExportItems (
     // namespaceと、default importと、named importを区別
     const firstSpecifier = node.specifiers[0]
       ? node.specifiers[0].type === 'ImportNamespaceSpecifier'
-        ? '*'
+        ? '*' + node.specifiers[0].local.name
         : node.specifiers[0].type === 'ImportDefaultSpecifier'
           ? node.specifiers[0].local.name
           : `{${node.specifiers[0].local.name}}`
@@ -870,13 +870,13 @@ const defaultGroups = [
   ['^\\u0000'],
   // Packages.
   // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
-  ['^(?=@?\\w)(?!(components|src))'], // もともとのルール ['^@?\\w']
+  ['^@?\\w'],
   // Absolute imports and other imports such as Vue-style `@/foo`.
   // Anything not matched in another group.
   ['^'],
   // Relative imports.
   // Anything that starts with a dot.
-  ['^(components|src|\\.)'], // もともとのルール ['^\\.'],
+  ['^\\.'],
 ];
 
 function maybeReportChunkSorting (chunk, context, outerGroups) {

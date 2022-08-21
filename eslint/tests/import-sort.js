@@ -1,13 +1,21 @@
 /* eslint-disable rulesdir/no-double-byte-char */
 'use strict';
+const path = require('path');
 
 const RuleTester = require('eslint').RuleTester;
 const rule = require('../rules/import-sort');
 
+const NODE_MODULES = '../../node_modules';
+const parsers = {
+  BABEL_ESLINT: path.join(__dirname, NODE_MODULES, 'babel-eslint'),
+  TYPESCRIPT_ESLINT: path.join(__dirname, NODE_MODULES, 'typescript-eslint-parser'),
+  '@TYPESCRIPT_ESLINT': path.join(__dirname, NODE_MODULES, '@typescript-eslint/parser'),
+};
+
 const tester = new RuleTester({
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 2015,
+    ecmaVersion: 2018,
   },
 });
 
@@ -47,6 +55,17 @@ tester.run('import-sort', rule, {
       `,
       options: [defaultOption],
     },
+    {
+      code: `
+      import 'sideeffect';
+
+      import * as React from "react";
+      import { Button } from "evergreen-ui";
+      import type { Saga } from 'redux-saga';
+      `,
+      options: [defaultOption],
+      parser: parsers.BABEL_ESLINT,
+    },
   ],
   invalid: [
     {
@@ -59,6 +78,32 @@ tester.run('import-sort', rule, {
       output: `
       import a from "b";
       import ab from "ab";
+      `,
+    },
+    {
+      code: `
+      import * as BillingTypes from './values/billing-types';
+      import * as Actions from './actions';
+      import * as AdvertiserAPI from './api/advertisers';
+      import * as Budgets from './values/budget';
+      import * as CampaignBannerTypes from './values/campaign-banner-types';
+      import * as DateTime from './values/datetime';
+      import * as HelpersAPI from './api/helpers';
+      import * as RemoteResource from './remote-resource';
+      import * as Response from './api/response';
+      `,
+      options: [defaultOption],
+      errors: ['Run autofix to sort these imports!'],
+      output: `
+      import * as Actions from './actions';
+      import * as AdvertiserAPI from './api/advertisers';
+      import * as BillingTypes from './values/billing-types';
+      import * as Budgets from './values/budget';
+      import * as CampaignBannerTypes from './values/campaign-banner-types';
+      import * as DateTime from './values/datetime';
+      import * as HelpersAPI from './api/helpers';
+      import * as RemoteResource from './remote-resource';
+      import * as Response from './api/response';
       `,
     },
   ],
